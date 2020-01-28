@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="portrait" name="screen-orientation">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+    <link href="https://www.qekang.com" rel="canonical">
+    <meta content="戚尔康的博客-薯条的博客-尔康博客-xyqierkang-xyqierkang@163.com-383888666-qierkang- CSDN博客" name="csdn-baidu-search">
+    <meta content="戚尔康的博客-薯条的博客-尔康博客-xyqierkang-xyqierkang@163.com-383888666-qierkang-是一名计算机软件行业的博主,他一直在热衷于分享后台技术栈,服务器领域的技术知识。他主要关注安全架构方面的内容。"
+          name="description">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <title>年会抽奖页面</title>
+    <link href="css/reset.css" rel="stylesheet" type="text/css">
+    <link href="css/wall.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+        }
+
+        .result {
+            position: absolute;
+            height: 320px;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            margin-top: -160px;
+            text-align: center;
+            padding: 10px;
+            display: none;
+        }
+
+        .result span {
+            display: inline-block;
+            font-size: 25px;
+            width: 163px;
+            background: #fff;
+            line-height: 30px;
+            color: #000;
+            margin: 5px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+        }
+
+        .loading {
+            position: absolute;
+            height: 320px;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            margin-top: -160px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .loading span {
+            display: inline-block;
+            font-size: 25px;
+            width: 163px;
+            background: #fff;
+            line-height: 30px;
+            color: #000;
+            margin: 5px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+        }
+
+        button, input, optgroup, select, textarea {
+            color: inherit;
+            font: inherit;
+            margin: 0;
+            border: none;
+        }
+
+        button {
+            overflow: visible;
+        }
+
+        button, select {
+            text-transform: none;
+        }
+
+        button, html input[type=button], input[type=reset], input[type=submit] {
+            -webkit-appearance: button;
+            cursor: pointer;
+        }
+
+        .pure-button {
+            display: inline-block;
+            zoom: 1;
+            line-height: normal;
+            white-space: nowrap;
+            vertical-align: middle;
+            text-align: center;
+            cursor: pointer;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .pure-button {
+            font-family: inherit;
+            font-size: 100%;
+            padding: .5em 1em;
+            color: #444;
+            color: rgba(0, 0, 0, .8);
+            border: 0 rgba(0, 0, 0, 0);
+            background-color: #E6E6E6;
+            text-decoration: none;
+            border-radius: 2px;
+        }
+
+        .pure-button:focus {
+            outline: 0
+        }
+
+        .pure-button-hover, .pure-button:hover, .pure-button:focus {
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#1a000000', GradientType=0);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(transparent), color-stop(40%, rgba(0, 0, 0, .05)), to(rgba(0, 0, 0, .1)));
+            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+            background-image: -moz-linear-gradient(top, rgba(0, 0, 0, .05) 0, rgba(0, 0, 0, .1));
+            background-image: -o-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+            background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+        }
+
+        .button-success, .button-error, .button-warning, .button-secondary {
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-success {
+            background: rgb(28, 184, 65);
+        }
+
+        .button-error {
+            background: rgb(202, 60, 60);
+        }
+
+        .button-warning {
+            background: rgb(223, 117, 20);
+        }
+
+        .button-secondary {
+            background: rgb(66, 184, 221);
+        }
+
+        .tools {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+        }
+
+        .tools .pure-button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 0;
+            text-align: center;
+            width: 50px;
+        }
+
+        .mask {
+            -webkit-filter: blur(5px);
+            filter: blur(5px);
+        }
+
+        #main {
+            -webkit-transition: all 1s;
+            transition: all 1s;
+        }
+
+        .result-btn {
+            margin-top: 20px;
+            text-align: right;
+            margin-right: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="wall" id="main">
+    <div class="loading">
+        <span>加载人员中...<br/></span>
+    </div>
+
+    <div class="result-btn">
+        <a href="./result.html" style="color: yellow;text-decoration: none" target="_blank">获奖名单</a>
+
+    </div>
+    <div class="result-btn">
+        <a href="员工列表.xlsx" style="color: deepskyblue;text-decoration: none" target="_blank">查看手机号</a>
+    </div>
+</div>
+<div class="result" id="result">
+</div>
+<div class="tools" id="tools">
+
+    <input :value="selected"
+           @change="onClick"
+           class="pure-button"
+           type="number"
+           v-model="selected"
+    />
+
+    <button
+            :class="{'button-secondary': !running,
+               'button-success': running}"
+            @click="toggle"
+            class="pure-button">{{running?'停止':'开始'}}
+    </button>
+    <button @click="close" class="pure-button button-warning" v-if="showClose">关闭</button>
+    <button @click="reset" class="pure-button button-warning">重置</button>
+</div>
+<script src="js/zepto.js" type="text/javascript"></script>
+<script src="js/vue.js" type="text/javascript"></script>
+<script src="js/tagcanvas.js" type="text/javascript"></script>
+<script type="text/javascript">
+    (function () {
+        var choosed = JSON.parse(localStorage.getItem('choosed')) || {};
+        var speed = function () {
+            return [0.1 * Math.random() + 0.01, -(0.1 * Math.random() + 0.01)];
+        };
+        var getKey = function (item) {
+            return item.name + '-' + item.phone;
+        };
+        // var member = []
+        var createHTML = function (mem) {
+            member = mem
+            var html = ['<ul>'];
+
+            member.forEach(function (item, index) {
+                item.index = index;
+                var key = getKey(item);
+                var color = choosed[key] ? 'yellow' : 'white';
+                html.push('<li><a href="#" style="color: ' + color + ';">' + item.name + '</a></li>');
+            });
+            html.push('</ul>');
+            return html.join('');
+        };
+        var lottery = function (count, ndArr) {
+            var ndm = null
+            if (ndArr && ndArr !== null && ndArr.length > 0) {
+                ndm = ndArr[ndArr.length - 1]
+            }
+            var list = canvas.getElementsByTagName('a');
+            var color = 'yellow';
+            var ret = member
+                .filter(function (m, index) {
+                    m.index = index;
+                    return !choosed[getKey(m)];
+                })
+                .map(function (m) {
+                    let score = Math.random()
+                    // nd一个
+                    if (ndm !== null) {
+                        if (m.phone === ndm.phone) {
+                            score = 0
+                        }
+                    }
+                    m.score = score
+                    return m;
+                })
+                .sort(function (a, b) {
+                    return a.score - b.score;
+                })
+                .slice(0, count)
+
+            let array = ret;
+            let len = array.length;
+
+            for (let i = len - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+
+            // 洗牌
+            ret = ret.map(function (m) {
+                choosed[getKey(m)] = 1;
+                list[m.index].style.color = color;
+                return m.name + '<br/>' + m.phone;
+            });
+            localStorage.setItem('choosed', JSON.stringify(choosed));
+            // 移除nd
+            if (ndArr && ndArr !== null && ndArr.length > 0) {
+                $.post('/v1/luck/api/delWinning', {phone: ndm.phone}, function (res) {
+                }, 'json', 1)
+            }
+            return ret;
+        };
+        var canvas = document.createElement('canvas');
+        canvas.id = 'myCanvas';
+        canvas.width = document.body.offsetWidth;
+        canvas.height = document.body.offsetHeight;
+        document.getElementById('main').appendChild(canvas);
+        new Vue({
+            el: '#tools',
+            data: {
+                selected: 5,
+                running: false,
+                btns: [
+                    30, 10, 5, 2, 1
+                ],
+                ndArr: [],
+                showClose: false
+            },
+            mounted() {
+                let token = localStorage.getItem("token");
+                if (!token) {
+                    window.location.href = 'manage.html?redirect=true'
+                } else {
+                    $.post('/v1/luck/api/getAll', null, function (res) {
+                        $(".loading").hide()
+                        member = res.data
+                        canvas.innerHTML = createHTML(member);
+                        TagCanvas.Start('myCanvas', '', {
+                            textColour: null,
+                            initial: speed(),
+                            dragControl: 1,
+                            textHeight: 14
+                        });
+                    }, 'json', token)
+                }
+
+            },
+            methods: {
+                reset: function () {
+                    if (confirm('确定要重置么？所有之前的抽奖历史将被清除！')) {
+                        let token = localStorage.getItem("token")
+                        localStorage.clear();
+                        location.reload(true);
+                        if (token) {
+                            localStorage.setItem("token", token)
+                        }
+
+                    }
+                },
+                onClick: function () {
+                    if (this.selected < 1) {
+                        this.selected = 1
+                    }
+                    $('#result').css('display', 'none');
+                    $('#main').removeClass('mask');
+                },
+                toggle: function () {
+                    if (this.running) {
+                        TagCanvas.SetSpeed('myCanvas', speed());
+                        var ret = lottery(this.selected, this.ndArr);
+                        if (ret.length === 0) {
+                            $('#result').css('display', 'block').html('<span>所有人员都已中奖！</span>');
+                            return
+                        }
+                        $('#result').css('display', 'block').html('<span>' + ret.join('</span><span>') + '</span>');
+                        TagCanvas.Reload('myCanvas');
+                        setTimeout(function () {
+                            let num = localStorage.getItem("num")
+                            if (!num) {
+                                num = 1
+                            } else {
+                                num++
+                            }
+                            localStorage.setItem("num", num)
+                            localStorage.setItem(num, JSON.stringify(ret));
+                            $('#main').addClass('mask');
+                        }, 300);
+                        this.showClose = true
+                    } else {
+                        if (!member || member.length === 0) {
+                            return
+                        }
+                        let that = this
+                        $.post('/v1/luck/api/getWinning', null, function (res) {
+                            that.ndArr = res.data
+                        }, 'json', 1)
+
+                        $('#result').css('display', 'none');
+                        $('#main').removeClass('mask');
+                        TagCanvas.SetSpeed('myCanvas', [5, 1]);
+                    }
+                    this.running = !this.running;
+                },
+                close() {
+                    this.showClose = false
+                    $('#result').css('display', 'none');
+                    $('#main').removeClass('mask');
+                }
+            }
+        });
+    })();
+</script>
+</body>
+</html>

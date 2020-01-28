@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="portrait" name="screen-orientation">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"
+          name="viewport"/>
+    <link href="https://www.qekang.com" rel="canonical">
+    <meta content="戚尔康的博客-薯条的博客-尔康博客-xyqierkang-xyqierkang@163.com-383888666-qierkang- CSDN博客" name="csdn-baidu-search">
+    <meta content="戚尔康的博客-薯条的博客-尔康博客-xyqierkang-xyqierkang@163.com-383888666-qierkang-是一名计算机软件行业的博主,他一直在热衷于分享后台技术栈,服务器领域的技术知识。他主要关注安全架构方面的内容。"
+          name="description">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <title>年会抽奖配置页面</title>
+    <link href="css/weui.min.css" rel="stylesheet" type="text/css">
+    <link href="css/demos.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="tools">
+
+    <div v-if="showMain">
+
+        员工管理:
+        <form id="frm" role="form">
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell" style="">
+                    <div class="weui-cell__hd"><label class="weui-label">员工列表：</label></div>
+                    <div class="weui-cell__bd"><input
+                            accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            class="weui-input" id="file"
+                            placeholder="请选择文件"
+                            style="height: 28px;" type="file"></div>
+                </div>
+
+            </div>
+
+            <div class="weui-cell weui-cells_radio">
+                <div class="weui-cell__hd">
+                    <div class="weui-label" style="width: 500px;">
+                        <button @click="upload" class="weui-btn weui-btn_mini weui-btn_primary" style="cursor: pointer"
+                                type="button">上传
+                        </button>
+                        <button @click="window.location.href= '员工列表.xlsx'"
+                                class="weui-btn weui-btn_mini weui-btn_primary"
+                                style="cursor: pointer" type="button">下载模板
+                        </button>
+                        <button @click="showMain = false" class="weui-btn weui-btn_mini weui-btn_primary"
+                                style="cursor: pointer"
+                                type="button">修改令牌
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+        <hr>
+
+        内定人员:(最后一个手机号将在下一轮中奖，中奖后自动移除手机号)
+        <form id="nf" role="form">
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">手机号：</label></div>
+                    <div class="weui-cell__bd"><input class="weui-input" placeholder="请输入手机号" type="text"
+                                                      v-model="ndPhone">
+                    </div>
+                </div>
+            </div>
+
+            <div class="weui-cell weui-cells_radio">
+                <div class="weui-cell__hd">
+                    <div class="weui-label" style="width: 200px;">
+                        <button @click="addNd" class="weui-btn weui-btn_mini weui-btn_primary" style="cursor: pointer"
+                                type="button">添加
+                        </button>
+                        <button @click="rmNd" class="weui-btn weui-btn_mini weui-btn_primary" style="cursor: pointer"
+                                type="button">移除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        当期内定手机号：
+        <span>{{ ndArr === '' ? '暂无' : ndArr }}</span>
+    </div>
+
+    <div v-if="!showMain">
+        <div style="width: 400px;height: 200px;margin:auto;">
+            <div class="weui-cells weui-cells_form">
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">令牌：</label></div>
+                    <div class="weui-cell__bd"><input class="weui-input" placeholder="请输入令牌" type="text"
+                                                      v-model="token">
+                    </div>
+                </div>
+            </div>
+            <div class="weui-cell weui-cells_radio" style="text-align: center">
+                <div class="weui-cell__hd">
+                    <div class="weui-label" style="width: 200px;">
+                        <button @click="addToken" class="weui-btn weui-btn_mini weui-btn_primary"
+                                style="cursor: pointer; width: 190%;"
+                                type="button">确定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script src="js/zepto.js" type="text/javascript"></script>
+<script src="js/vue.js" type="text/javascript"></script>
+<script src="js/tagcanvas.js" type="text/javascript"></script>
+<script type="text/javascript">
+    (function () {
+        new Vue({
+            el: '#tools',
+            data: {
+                data: null,
+                running: false,
+                ndPhone: null,
+                msg: null,
+                ndArr: '暂无',
+                showMain: false,
+                token: null
+            },
+            mounted() {
+                let token = localStorage.getItem("token")
+                if (token === null) {
+                    this.showMain = false
+                } else {
+                    this.token = token
+                    this.showMain = true
+                    let that = this
+                    $.post('/v1/luck/api/getWinning', {phone: this.ndPhone}, function (res) {
+                        let arr = []
+                        res.data.map(m => {
+                            arr.push(m.phone)
+                        })
+                        that.ndArr = arr.join(",")
+                    }, 'json', token)
+
+                    $.post('/v1/luck/api/getAll', null, function (res) {
+                        that.data = res.data
+                    }, 'json', token)
+                }
+            },
+            methods: {
+                addNd() {
+                    let that = this
+                    if (!this.ndPhone) {
+                        alert("请填写手机号")
+                        return
+                    }
+
+                    let arr = []
+                    $.post('/v1/luck/api/setWinning', {phone: this.ndPhone}, function (res) {
+                        if (res.code !== '000000') {
+                            alert("手机号不存在！")
+                            return
+                        }
+                        res.data.map(m => {
+                            arr.push(m.phone)
+                        })
+                        that.ndArr = arr.join(",")
+                        that.ndPhone = null
+                    }, 'json', that.token)
+                },
+                rmNd() {
+                    let that = this
+                    if (!this.ndPhone) {
+                        alert("请填写手机号")
+                        return
+                    }
+                    $.post('/v1/luck/api/delWinning', {phone: this.ndPhone}, function (res) {
+                        let arr = that.ndArr.split(",");
+                        let i = arr.indexOf(that.ndPhone)
+                        arr.splice(i, 1)
+                        that.ndArr = arr.join(",")
+                        that.ndPhone = null
+                    }, 'json', that.token)
+
+                },
+                upload() {
+                    postData()
+                }
+                ,
+                addToken() {
+                    localStorage.setItem("token", this.token)
+                    this.showMain = true
+                    let red = this.GetQueryString('redirect')
+                    if (red && red !== '') {
+                        window.location.href = '/'
+                    }
+                },
+                GetQueryString(name) {
+                    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                    let r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]);
+                    return null;
+                }
+            }
+        });
+
+        function postData() {
+            var formData = new FormData();
+            var file = $("#file")[0].files[0]
+            if (!file) {
+                alert("请选择文件！")
+                return
+            }
+            formData.append("file", file);
+            $.ajax({
+                url: '/v1/luck/api/upload', /*接口域名地址*/
+                type: 'post',
+                data: formData,
+                contentType: false,
+                headers: {token: 1},
+                processData: false,
+                success: function (res) {
+                    if (res.code === '000000') {
+                        alert('更新员工成功');
+                    } else {
+                        alert('失败');
+                    }
+                }
+            })
+        }
+
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+luck:
+  mes:
+    name: "this is application.yml"
+
+spring:
+  redis:
+    host: 47.100.32.28
+    port: 6379
+    password: qierkang
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  cache:
+    type: redis
+    redis:
+      cache-null-values: false
+      use-key-prefix: true
+      time-to-live: 600000
+#  security:
+#    basic:
+#      enabled: true
+#    user:
+#      name: admin
+#      password: password
+
+
+#feign.hystrix.enabled: true
+
+#hystrix:
+#  command:
+#    default:
+#      fallback.enabled: false
+#      circuitBreaker.enabled: true
+#      execution.isolation.thread.timeoutInMilliseconds: 5000
+#  threadpool:
+#    default:
+#      coreSize: 20
+#      maximumSize: 20
