@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  * <p>Department: Product development </p>
  * *********************************************************
  */
-@FeignClient(value = "luckdraw-service/v1/service/", url = "http://192.168.8.100:9001/v1/service/", configuration = LuckService.MultipartSupportConfig.class)
+@FeignClient(value = "luckdraw-service/v1/service/", url = "http://47.100.32.28:9002/v1/service/", configuration = LuckService.MultipartSupportConfig.class)
 public interface LuckService {
 
     /**
