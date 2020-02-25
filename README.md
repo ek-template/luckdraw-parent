@@ -58,10 +58,10 @@ Hutool是一个小而全的Java工具类库，通过静态方法封装，降低�
 ## Docker部署方式
 
 - 制作服务镜像
-```docker build -t luckdraw-service .```
+```docker build -t qierkang/luckdraw-service .```
 
 - 制作网关镜像
-```docker build -t luckdraw-geteway .```
+```docker build -t qierkang/luckdraw-geteway .```
 
 - 启动服务
 ``` docker run -d --name luckdraw-service --restart always -e PORT=9001 -p 9001:9001 qierkang/luckdraw-service```
